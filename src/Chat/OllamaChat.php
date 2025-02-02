@@ -271,8 +271,8 @@ class OllamaChat implements ChatInterface
     protected function decodeStreamOfText(ResponseInterface $response): StreamInterface
     {
         // Split the application/x-ndjson response into json responses
-        $generator = function(ResponseInterface $response) {
-            while (!$response->getBody()->eof()) {
+        $generator = function (ResponseInterface $response) {
+            while (! $response->getBody()->eof()) {
                 $line = $this->readLineFromStream($response->getBody());
 
                 if (empty($line)) {
@@ -300,7 +300,7 @@ class OllamaChat implements ChatInterface
     {
         $buffer = '';
 
-        while (!$stream->eof()) {
+        while (! $stream->eof()) {
             if ('' === ($byte = $stream->read(1))) {
                 return $buffer;
             }
@@ -318,8 +318,8 @@ class OllamaChat implements ChatInterface
      */
     protected function decodeStreamOfChat(ResponseInterface $response): StreamInterface
     {
-        $generator = function(ResponseInterface $response) {
-            while (!$response->getBody()->eof()) {
+        $generator = function (ResponseInterface $response) {
+            while (! $response->getBody()->eof()) {
                 $line = $this->readLineFromStream($response->getBody());
 
                 if (empty($line)) {

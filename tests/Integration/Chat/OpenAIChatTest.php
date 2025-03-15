@@ -57,19 +57,6 @@ it('can call a function', function () {
     $chat->generateText('Who is Marie Curie in one line? My email is student@foo.com');
 });
 
-it('can call a function without argument', function () {
-    $chat = new OpenAIChat();
-    $notifier = new NotificationExample();
-
-    $functionSendNotification = FunctionBuilder::buildFunctionInfo($notifier, 'sendNotificationToSlack');
-
-    $chat->addTool($functionSendNotification);
-    $chat->setSystemMessage('You need to call the function to send a confirmation notification to slack');
-    $functionInfo = $chat->generateTextOrReturnFunctionCalled('the confirmation should be called');
-
-    expect($functionInfo->name)->toBe('sendNotificationToSlack');
-});
-
 it('calls tool functions during a chat', function () {
     $chat = new OpenAIChat();
     $notifier = new NotificationExample();

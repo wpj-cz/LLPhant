@@ -36,6 +36,8 @@ class OpenAIChat implements ChatInterface
 
     private ?CreateResponse $lastResponse = null;
 
+    private ?OpenAI\Responses\Chat\CreateStreamedResponse $lastStreamedResponse = null;
+
     private int $totalTokens = 0;
 
     /** @var array<string, mixed> */
@@ -86,6 +88,11 @@ class OpenAIChat implements ChatInterface
     public function getLastResponse(): ?CreateResponse
     {
         return $this->lastResponse;
+    }
+
+    public function getLastStreamedResponse(): ?OpenAI\Responses\Chat\CreateStreamedResponse
+    {
+        return $this->lastStreamedResponse;
     }
 
     public function getTotalTokens(): int
@@ -253,6 +260,11 @@ class OpenAIChat implements ChatInterface
         $stream = $this->client->chat()->createStreamed($openAiArgs);
         $generator = function (StreamResponse $stream) {
             foreach ($stream as $partialResponse) {
+                if($partialResponse->usage && empty($partialResponse->choices)) {
+                    $this->lastStreamedResponse = $partialResponse ?? null;
+                    continue;
+                }
+                
                 $toolCalls = $partialResponse->choices[0]->delta->toolCalls ?? [];
                 $toolsCalled = [];
                 /** @var CreateStreamedResponseToolCall $toolCall */
@@ -274,7 +286,7 @@ class OpenAIChat implements ChatInterface
                 }
 
                 if (! is_null($partialResponse->choices[0]->finishReason)) {
-                    break;
+                    continue;
                 }
 
                 if ($partialResponse->choices[0]->delta->content === null) {
